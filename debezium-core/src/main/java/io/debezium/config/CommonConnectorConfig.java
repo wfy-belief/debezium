@@ -1620,21 +1620,21 @@ public abstract class CommonConnectorConfig {
         return signalEnabledChannels;
     }
 
-    public Optional<String[]> parseSignallingMessage(Struct value) {
-        final Struct after = value.getStruct(Envelope.FieldName.AFTER);
-        if (after == null) {
-            LOGGER.warn("After part of signal '{}' is missing", value);
+    public Optional<String[]> parseSignallingMessage(Struct value, String fieldName) {
+        final Struct event = value.getStruct(fieldName);
+        if (event == null) {
+            LOGGER.warn("Field {} part of signal '{}' is missing", fieldName, value);
             return Optional.empty();
         }
-        List<org.apache.kafka.connect.data.Field> fields = after.schema().fields();
+        List<org.apache.kafka.connect.data.Field> fields = event.schema().fields();
         if (fields.size() != 3) {
-            LOGGER.warn("The signal event '{}' should have 3 fields but has {}", after, fields.size());
+            LOGGER.warn("The signal event '{}' should have 3 fields but has {}", event, fields.size());
             return Optional.empty();
         }
         return Optional.of(new String[]{
-                after.getString(fields.get(0).name()),
-                after.getString(fields.get(1).name()),
-                after.getString(fields.get(2).name())
+                event.getString(fields.get(0).name()),
+                event.getString(fields.get(1).name()),
+                event.getString(fields.get(2).name())
         });
     }
 
